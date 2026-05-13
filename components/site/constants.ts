@@ -9,6 +9,7 @@ export const navLinks: Array<{ label: string; href: string; hasChevron?: boolean
 
 export const devLinks = [
   { label: "Product Page", href: "/dev/product" },
+  { label: "Store Page", href: "/dev/store" },
 ] as const;
 
 export const brandLogos = [
