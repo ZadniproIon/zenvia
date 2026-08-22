@@ -10,11 +10,11 @@ This repo uses a modern Next.js version that may differ from older defaults. Bef
 ## Tech Stack
 - Frontend: Next.js, TypeScript, Tailwind CSS, shadcn/ui
 - Backend: Next.js Route Handlers and Server Actions
-- Data: PostgreSQL on Neon with Prisma ORM
-- Auth: Auth.js
-- Payments: Stripe Checkout with test-mode webhooks only for now
-- Hosting: Vercel
-- Images: local `public/` assets first, with Cloudinary or another remote image service as a possible later upgrade
+- Data: PostgreSQL via Docker with Prisma ORM
+- Auth: Auth.js with Local Credentials Provider
+- Payments: Custom Mock Checkout Flow (Local)
+- Hosting: Vercel (Future)
+- Images: Local `public/` assets and `public/uploads`
 
 ## Working Notes
 - Preserve this stack unless the user explicitly changes it.

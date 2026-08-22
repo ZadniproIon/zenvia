@@ -1,4 +1,4 @@
-﻿import Image from "next/image";
+import Image from "next/image";
 import Link from "next/link";
 import { BadgeCheck, ChevronLeft, ChevronRight, Sparkles, Star } from "lucide-react";
 
@@ -8,83 +8,7 @@ import { brandLogos, containerClass } from "@/components/site/constants";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
-type Product = {
-  name: string;
-  image: string;
-  price: number;
-  originalPrice?: number;
-  discount?: string;
-  rating: number;
-  imageClassName?: string;
-};
-
-const newArrivals: Product[] = [
-  {
-    name: "T-shirt with Tape Details",
-    image: "/figma-home/new-1.png",
-    price: 120,
-    rating: 4.5,
-    imageClassName: "scale-[1.08] translate-y-3",
-  },
-  {
-    name: "Skinny Fit Jeans",
-    image: "/figma-home/new-2.png",
-    price: 240,
-    originalPrice: 260,
-    discount: "-20%",
-    rating: 3.5,
-    imageClassName: "scale-[1.06] translate-y-5",
-  },
-  {
-    name: "Checkered Shirt",
-    image: "/figma-home/new-3.png",
-    price: 180,
-    rating: 4.5,
-    imageClassName: "scale-[1.08] translate-y-3",
-  },
-  {
-    name: "Sleeve Striped T-shirt",
-    image: "/figma-home/new-4.png",
-    price: 130,
-    originalPrice: 160,
-    discount: "-30%",
-    rating: 4.5,
-    imageClassName: "scale-[1.08] translate-y-4",
-  },
-];
-
-const topSelling: Product[] = [
-  {
-    name: "Vertical Striped Shirt",
-    image: "/figma-home/top-1.png",
-    price: 212,
-    originalPrice: 232,
-    discount: "-20%",
-    rating: 5,
-    imageClassName: "scale-[1.1] translate-y-4",
-  },
-  {
-    name: "Courage Graphic T-shirt",
-    image: "/figma-home/top-2.png",
-    price: 145,
-    rating: 4,
-    imageClassName: "scale-[1.08] translate-y-4",
-  },
-  {
-    name: "Loose Fit Bermuda Shorts",
-    image: "/figma-home/asset-13.png",
-    price: 80,
-    rating: 3,
-    imageClassName: "scale-[1.14] translate-y-8",
-  },
-  {
-    name: "Faded Skinny Jeans",
-    image: "/figma-home/asset-14.png",
-    price: 210,
-    rating: 4.5,
-    imageClassName: "scale-[1.1] translate-y-5",
-  },
-];
+import { Product } from "@prisma/client";
 
 const styleCards = [
   {
@@ -155,7 +79,7 @@ function RatingStars({ rating }: { rating: number }) {
   );
 }
 
-function PriceBlock({ price, originalPrice, discount }: Pick<Product, "price" | "originalPrice" | "discount">) {
+function PriceBlock({ price, originalPrice, discount }: { price: number; originalPrice?: number | null; discount?: string | null }) {
   return (
     <div className="flex flex-wrap items-center gap-2.5 text-[24px] font-bold leading-none tracking-[-0.03em] text-black sm:gap-3">
       <span>${price}</span>
@@ -169,16 +93,16 @@ function PriceBlock({ price, originalPrice, discount }: Pick<Product, "price" | 
   );
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product }: { product: Product & { imageClassName?: string } }) {
   return (
-    <article className="space-y-3.5">
+    <Link href={`/product/${product.id}`} className="group block space-y-3.5">
       <div className="relative aspect-[295/298] overflow-hidden rounded-[20px] bg-[#f0eeed]">
         <Image
           src={product.image}
           alt={product.name}
           fill
           sizes="(max-width: 768px) 50vw, 295px"
-          className={cn("object-contain", product.imageClassName)}
+          className={cn("object-contain transition-transform group-hover:scale-105", product.imageClassName)}
         />
       </div>
       <div className="space-y-2.5">
@@ -191,7 +115,7 @@ function ProductCard({ product }: { product: Product }) {
         </div>
         <PriceBlock price={product.price} originalPrice={product.originalPrice} discount={product.discount} />
       </div>
-    </article>
+    </Link>
   );
 }
 
@@ -223,7 +147,12 @@ function TestimonialCard({ testimonial, faded = false }: { testimonial: (typeof 
   );
 }
 
-export default function Home() {
+import prisma from "@/lib/prisma";
+
+export default async function Home() {
+  const newArrivals = await prisma.product.findMany({ take: 4, orderBy: { createdAt: 'desc' } });
+  const topSelling = await prisma.product.findMany({ take: 4, orderBy: { rating: 'desc' } });
+  
   return (
     <div className="min-h-screen bg-white text-black">
       <SiteHeader />

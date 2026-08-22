@@ -1,4 +1,4 @@
-﻿import Image from "next/image";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ChevronDown,
@@ -15,89 +15,7 @@ import { containerClass } from "@/components/site/constants";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
-type StoreProduct = {
-  name: string;
-  image: string;
-  price: number;
-  originalPrice?: number;
-  discount?: string;
-  rating: number;
-  imageClassName?: string;
-};
 
-const products: StoreProduct[] = [
-  {
-    name: "Gradient Graphic T-shirt",
-    image: "/figma-store/product-1.png",
-    price: 145,
-    rating: 3.5,
-    imageClassName: "scale-[1.08] translate-y-5",
-  },
-  {
-    name: "Polo with Tipping Details",
-    image: "/figma-store/product-2.png",
-    price: 180,
-    rating: 4.5,
-    imageClassName: "scale-[1.08] translate-y-5",
-  },
-  {
-    name: "Black Striped T-shirt",
-    image: "/figma-store/product-3.png",
-    price: 120,
-    originalPrice: 150,
-    discount: "-30%",
-    rating: 5,
-    imageClassName: "scale-[1.08] translate-y-4",
-  },
-  {
-    name: "Skinny Fit Jeans",
-    image: "/figma-store/product-4.png",
-    price: 240,
-    originalPrice: 260,
-    discount: "-20%",
-    rating: 3.5,
-    imageClassName: "scale-[1.06] translate-y-5",
-  },
-  {
-    name: "Checkered Shirt",
-    image: "/figma-store/product-5.png",
-    price: 180,
-    rating: 4.5,
-    imageClassName: "scale-[1.08] translate-y-3",
-  },
-  {
-    name: "Sleeve Striped T-shirt",
-    image: "/figma-store/product-6.png",
-    price: 130,
-    originalPrice: 160,
-    discount: "-30%",
-    rating: 4.5,
-    imageClassName: "scale-[1.08] translate-y-4",
-  },
-  {
-    name: "Vertical Striped Shirt",
-    image: "/figma-store/product-7.png",
-    price: 212,
-    originalPrice: 232,
-    discount: "-20%",
-    rating: 5,
-    imageClassName: "scale-[1.1] translate-y-4",
-  },
-  {
-    name: "Courage Graphic T-shirt",
-    image: "/figma-store/product-8.png",
-    price: 145,
-    rating: 4,
-    imageClassName: "scale-[1.08] translate-y-4",
-  },
-  {
-    name: "Loose Fit Bermuda Shorts",
-    image: "/figma-store/product-9.png",
-    price: 80,
-    rating: 3,
-    imageClassName: "scale-[1.14] translate-y-8",
-  },
-];
 
 const categoryLinks = ["T-shirts", "Shorts", "Shirts", "Hoodie", "Jeans"] as const;
 const dressStyles = ["Casual", "Formal", "Party", "Gym"] as const;
@@ -134,7 +52,10 @@ function RatingStars({ rating }: { rating: number }) {
   );
 }
 
-function PriceBlock({ price, originalPrice, discount }: Pick<StoreProduct, "price" | "originalPrice" | "discount">) {
+import { Product } from "@prisma/client";
+import prisma from "@/lib/prisma";
+
+function PriceBlock({ price, originalPrice, discount }: { price: number; originalPrice?: number | null; discount?: string | null }) {
   return (
     <div className="flex flex-wrap items-center gap-2.5 text-[24px] font-bold leading-none tracking-[-0.03em] text-black sm:gap-3">
       <span>${price}</span>
@@ -144,11 +65,11 @@ function PriceBlock({ price, originalPrice, discount }: Pick<StoreProduct, "pric
   );
 }
 
-function StoreProductCard({ product }: { product: StoreProduct }) {
+function StoreProductCard({ product }: { product: Product & { imageClassName?: string } }) {
   return (
-    <article className="space-y-3.5">
+    <Link href={`/product/${product.id}`} className="group block space-y-3.5">
       <div className="relative aspect-[295/298] overflow-hidden rounded-[20px] bg-[#F0EEED]">
-        <Image src={product.image} alt={product.name} fill sizes="(max-width: 1024px) 50vw, 295px" className={cn("object-contain", product.imageClassName)} />
+        <Image src={product.image} alt={product.name} fill sizes="(max-width: 1024px) 50vw, 295px" className={cn("object-contain transition-transform group-hover:scale-105", product.imageClassName)} />
       </div>
       <div className="space-y-2.5">
         <h3 className="text-base font-bold leading-[1.35] text-black sm:text-[20px]">{product.name}</h3>
@@ -158,7 +79,7 @@ function StoreProductCard({ product }: { product: StoreProduct }) {
         </div>
         <PriceBlock price={product.price} originalPrice={product.originalPrice} discount={product.discount} />
       </div>
-    </article>
+    </Link>
   );
 }
 
@@ -174,7 +95,9 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
   );
 }
 
-export default function StorePage() {
+export default async function StorePage() {
+  const products = await prisma.product.findMany();
+  
   return (
     <div className="min-h-screen bg-white text-black">
       <SiteHeader />

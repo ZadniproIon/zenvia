@@ -1,8 +1,9 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { ChevronDown, CircleUserRound, Menu, Search, ShoppingCart, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { containerClass, devLinks, navLinks } from "@/components/site/constants";
+import { CartSheet } from "@/components/cart-sheet";
 
 export function SiteHeader() {
   return (
@@ -79,9 +80,7 @@ export function SiteHeader() {
             <button type="button" className="rounded-full p-1.5 text-black lg:hidden" aria-label="Search products">
               <Search className="size-5" />
             </button>
-            <button type="button" className="rounded-full p-1.5 text-black" aria-label="View cart">
-              <ShoppingCart className="size-5" />
-            </button>
+            <CartSheet />
             <button type="button" className="rounded-full p-1.5 text-black" aria-label="View account">
               <CircleUserRound className="size-5" />
             </button>
