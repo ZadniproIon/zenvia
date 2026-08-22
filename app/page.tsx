@@ -1,36 +1,40 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BadgeCheck, ChevronLeft, ChevronRight, Sparkles, Star } from "lucide-react";
+import { BadgeCheck, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 
+import prisma from "@/lib/prisma";
 import { SiteFooter } from "@/components/site/footer";
 import { SiteHeader } from "@/components/site/header";
 import { brandLogos, containerClass } from "@/components/site/constants";
 import { Separator } from "@/components/ui/separator";
+import { ProductCard, RatingStars } from "@/components/product-card";
 import { cn } from "@/lib/utils";
-
-import { Product } from "@prisma/client";
 
 const styleCards = [
   {
     title: "Casual",
+    href: "/shop?dressStyle=Casual",
     image: "/figma-home/browse-casual.png",
     className: "lg:col-span-4 lg:row-span-1",
     imageClassName: "object-cover object-[78%_24%] scale-[1.02]",
   },
   {
     title: "Formal",
+    href: "/shop?dressStyle=Formal",
     image: "/figma-home/asset-17.png",
     className: "lg:col-span-8 lg:row-span-1",
     imageClassName: "object-cover object-[84%_18%]",
   },
   {
     title: "Party",
+    href: "/shop?dressStyle=Party",
     image: "/figma-home/asset-18.png",
     className: "lg:col-span-8 lg:row-span-1",
     imageClassName: "object-cover object-[65%_12%]",
   },
   {
     title: "Gym",
+    href: "/shop?dressStyle=Gym",
     image: "/figma-home/asset-16.png",
     className: "lg:col-span-4 lg:row-span-1",
     imageClassName: "object-cover object-[42%_20%]",
@@ -55,69 +59,10 @@ const testimonials = [
     text: "As someone who's always on the lookout for unique fashion pieces, I'm thrilled to have stumbled upon Zenvia. The selection of clothes is not only diverse but also on-point with the latest trends.",
   },
   {
-    name: "Sarah M.",
-    text: "I'm blown away by the quality and style of the clothes I received from Zenvia. From casual wear to elegant dresses, every piece I've bought has exceeded my expectations.",
+    name: "Samantha D.",
+    text: "The shipping was incredibly fast and the materials feel so premium. Absolutely love the streetwear aesthetic and fits!",
   },
 ] as const;
-
-function RatingStars({ rating }: { rating: number }) {
-  return (
-    <div className="flex items-center gap-[5.5px]" aria-label={`${rating} out of 5 stars`}>
-      {Array.from({ length: 5 }, (_, index) => {
-        const fill = Math.max(0, Math.min(1, rating - index));
-
-        return (
-          <span key={index} className="relative block size-[18px]">
-            <Star className="size-[18px] fill-[#FFC633]/25 text-[#FFC633]" strokeWidth={1.4} />
-            <span className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}>
-              <Star className="size-[18px] fill-[#FFC633] text-[#FFC633]" strokeWidth={1.4} />
-            </span>
-          </span>
-        );
-      })}
-    </div>
-  );
-}
-
-function PriceBlock({ price, originalPrice, discount }: { price: number; originalPrice?: number | null; discount?: string | null }) {
-  return (
-    <div className="flex flex-wrap items-center gap-2.5 text-[24px] font-bold leading-none tracking-[-0.03em] text-black sm:gap-3">
-      <span>${price}</span>
-      {originalPrice ? <span className="text-black/40 line-through">${originalPrice}</span> : null}
-      {discount ? (
-        <span className="rounded-full bg-[#ff3333]/10 px-3.5 py-1.5 text-xs font-medium text-[#ff3333] sm:text-sm">
-          {discount}
-        </span>
-      ) : null}
-    </div>
-  );
-}
-
-function ProductCard({ product }: { product: Product & { imageClassName?: string } }) {
-  return (
-    <Link href={`/product/${product.id}`} className="group block space-y-3.5">
-      <div className="relative aspect-[295/298] overflow-hidden rounded-[20px] bg-[#f0eeed]">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          sizes="(max-width: 768px) 50vw, 295px"
-          className={cn("object-contain transition-transform group-hover:scale-105", product.imageClassName)}
-        />
-      </div>
-      <div className="space-y-2.5">
-        <h3 className="text-base font-bold leading-[1.35] text-black sm:text-[20px]">{product.name}</h3>
-        <div className="flex items-center gap-[13px] text-xs text-black sm:text-sm">
-          <RatingStars rating={product.rating} />
-          <span>
-            {product.rating.toFixed(1)}/<span className="text-black/60">5</span>
-          </span>
-        </div>
-        <PriceBlock price={product.price} originalPrice={product.originalPrice} discount={product.discount} />
-      </div>
-    </Link>
-  );
-}
 
 function SectionHeading({ title }: { title: string }) {
   return (
@@ -131,8 +76,8 @@ function TestimonialCard({ testimonial, faded = false }: { testimonial: (typeof 
   return (
     <article
       className={cn(
-        "h-full min-w-[340px] rounded-[20px] border border-black/10 bg-white px-8 py-7 transition-transform",
-        faded && "opacity-50 blur-[2px]"
+        "h-full min-w-[320px] sm:min-w-[380px] rounded-[20px] border border-black/10 bg-white p-7 transition-transform",
+        faded && "opacity-50 blur-[1px]"
       )}
     >
       <div className="space-y-[15px]">
@@ -147,17 +92,25 @@ function TestimonialCard({ testimonial, faded = false }: { testimonial: (typeof 
   );
 }
 
-import prisma from "@/lib/prisma";
-
 export default async function Home() {
-  const newArrivals = await prisma.product.findMany({ take: 4, orderBy: { createdAt: 'desc' } });
-  const topSelling = await prisma.product.findMany({ take: 4, orderBy: { rating: 'desc' } });
-  
+  const newArrivals = await prisma.product.findMany({
+    where: { isNewArrival: true },
+    take: 4,
+    orderBy: { createdAt: "desc" },
+  });
+
+  const topSelling = await prisma.product.findMany({
+    where: { isTopSelling: true },
+    take: 4,
+    orderBy: { rating: "desc" },
+  });
+
   return (
     <div className="min-h-screen bg-white text-black">
       <SiteHeader />
 
       <main>
+        {/* Hero Section */}
         <section className="overflow-hidden bg-[#f2f0f1]">
           <div className={`${containerClass} relative grid min-h-[calc(100vh-120px)] gap-10 py-12 sm:py-16 lg:min-h-[663px] lg:grid-cols-[577px_minmax(0,1fr)] lg:items-center lg:gap-0 lg:py-0`}>
             <Sparkles className="absolute right-[4%] top-[13%] hidden size-[104px] fill-black text-black lg:block" strokeWidth={1.25} />
@@ -174,8 +127,8 @@ export default async function Home() {
               </div>
 
               <Link
-                href="#new-arrivals"
-                className="inline-flex h-[52px] items-center justify-center rounded-full bg-black px-[54px] text-base font-medium text-white transition hover:bg-black/90"
+                href="/shop"
+                className="inline-flex h-[52px] items-center justify-center rounded-full bg-black px-[54px] text-base font-medium text-white transition hover:bg-black/90 shadow-lg"
               >
                 Shop Now
               </Link>
@@ -210,14 +163,16 @@ export default async function Home() {
           </div>
         </section>
 
+        {/* Brands Strip */}
         <section id="brands" className="bg-black">
           <div className={`${containerClass} flex flex-wrap items-center justify-center gap-x-8 gap-y-6 py-10 sm:justify-between lg:h-[122px] lg:flex-nowrap lg:py-0`}>
             {brandLogos.map((logo) => (
-              <Image key={logo.alt} src={logo.src} alt={logo.alt} width={logo.width} height={logo.height} className="h-auto w-auto max-h-10" />
+              <Image key={logo.alt} src={logo.src} alt={logo.alt} width={logo.width} height={logo.height} className="h-auto w-auto max-h-10 opacity-90 hover:opacity-100 transition" />
             ))}
           </div>
         </section>
 
+        {/* New Arrivals Section */}
         <section id="new-arrivals" className={`${containerClass} pt-14 sm:pt-[72px]`}>
           <div className="space-y-10 sm:space-y-[55px]">
             <div className="text-center">
@@ -225,13 +180,25 @@ export default async function Home() {
             </div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 md:gap-x-5">
               {newArrivals.map((product) => (
-                <ProductCard key={product.name} product={product} />
+                <ProductCard
+                  key={product.id}
+                  id={product.id}
+                  name={product.name}
+                  image={product.image}
+                  price={product.price}
+                  originalPrice={product.originalPrice}
+                  discount={product.discount}
+                  rating={product.rating}
+                />
               ))}
             </div>
             <div className="flex justify-center">
-              <button type="button" className="inline-flex h-[52px] min-w-[218px] items-center justify-center rounded-full border border-black/10 px-12 text-sm font-medium text-black transition hover:bg-black hover:text-white sm:text-base">
+              <Link
+                href="/shop?sort=newest"
+                className="inline-flex h-[52px] min-w-[218px] items-center justify-center rounded-full border border-black/10 px-12 text-sm font-medium text-black transition hover:bg-black hover:text-white sm:text-base"
+              >
                 View All
-              </button>
+              </Link>
             </div>
           </div>
         </section>
@@ -240,24 +207,38 @@ export default async function Home() {
           <Separator className="bg-black/10" />
         </div>
 
-        <section id="on-sale" className={`${containerClass} pt-14 sm:pt-[72px]`}>
+        {/* Top Selling Section */}
+        <section id="top-selling" className={`${containerClass} pt-14 sm:pt-[72px]`}>
           <div className="space-y-10 sm:space-y-[55px]">
             <div className="text-center">
               <SectionHeading title="Top Selling" />
             </div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 md:gap-x-5">
               {topSelling.map((product) => (
-                <ProductCard key={product.name} product={product} />
+                <ProductCard
+                  key={product.id}
+                  id={product.id}
+                  name={product.name}
+                  image={product.image}
+                  price={product.price}
+                  originalPrice={product.originalPrice}
+                  discount={product.discount}
+                  rating={product.rating}
+                />
               ))}
             </div>
             <div className="flex justify-center">
-              <button type="button" className="inline-flex h-[52px] min-w-[218px] items-center justify-center rounded-full border border-black/10 px-12 text-sm font-medium text-black transition hover:bg-black hover:text-white sm:text-base">
+              <Link
+                href="/shop?sort=popular"
+                className="inline-flex h-[52px] min-w-[218px] items-center justify-center rounded-full border border-black/10 px-12 text-sm font-medium text-black transition hover:bg-black hover:text-white sm:text-base"
+              >
                 View All
-              </button>
+              </Link>
             </div>
           </div>
         </section>
 
+        {/* Browse by Dress Style */}
         <section className={`${containerClass} pt-14 sm:pt-20`}>
           <div className="rounded-[28px] bg-[#f0f0f0] px-4 py-10 sm:px-6 md:px-10 lg:px-16 lg:py-[70px]">
             <div className="text-center">
@@ -265,18 +246,29 @@ export default async function Home() {
             </div>
             <div className="mt-10 grid auto-rows-[190px] grid-cols-2 gap-4 lg:mt-16 lg:auto-rows-[289px] lg:grid-cols-12 lg:gap-5">
               {styleCards.map((card) => (
-                <article key={card.title} className={cn("relative overflow-hidden rounded-[20px] bg-white", card.className)}>
+                <Link
+                  key={card.title}
+                  href={card.href}
+                  className={cn("group relative overflow-hidden rounded-[20px] bg-white transition hover:shadow-md", card.className)}
+                >
                   <h3 className="relative z-10 px-6 pt-6 text-[28px] font-bold leading-none tracking-[-0.04em] text-black lg:px-9 lg:pt-6 lg:text-[36px]">
                     {card.title}
                   </h3>
-                  <Image src={card.image} alt={card.title} fill sizes="(max-width: 1024px) 50vw, 33vw" className={card.imageClassName} />
-                </article>
+                  <Image
+                    src={card.image}
+                    alt={card.title}
+                    fill
+                    sizes="(max-width: 1024px) 50vw, 33vw"
+                    className={cn("transition-transform duration-300 group-hover:scale-105", card.imageClassName)}
+                  />
+                </Link>
               ))}
             </div>
           </div>
         </section>
 
-        <section className={`${containerClass} overflow-hidden pt-14 sm:pt-20 lg:pt-[76px]`}>
+        {/* Happy Customers Testimonials */}
+        <section id="testimonials" className={`${containerClass} overflow-hidden pt-14 sm:pt-20 lg:pt-[76px]`}>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <SectionHeading title="Our Happy Customers" />
             <div className="flex items-center gap-3 self-end lg:self-auto">
@@ -290,10 +282,10 @@ export default async function Home() {
           </div>
 
           <div className="mt-10 overflow-hidden lg:mt-12">
-            <div className="flex gap-5 overflow-x-auto pb-2 lg:min-w-[calc(400px*5+20px*4)] lg:translate-x-[-320px] lg:overflow-visible lg:pb-0">
+            <div className="flex gap-5 overflow-x-auto pb-4 lg:overflow-visible">
               {testimonials.map((testimonial, index) => (
                 <div key={`${testimonial.name}-${index}`} className="shrink-0 lg:w-[400px]">
-                  <TestimonialCard testimonial={testimonial} faded={index === 0 || index === testimonials.length - 1} />
+                  <TestimonialCard testimonial={testimonial} />
                 </div>
               ))}
             </div>

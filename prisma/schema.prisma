@@ -12,7 +12,7 @@ model User {
   email     String   @unique
   password  String
   name      String?
-  role      String   @default("USER") // Changed from enum to string because sqlite doesn't support enums well
+  role      String   @default("USER")
   orders    Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -21,6 +21,7 @@ model User {
 model Category {
   id          String    @id @default(cuid())
   name        String    @unique
+  slug        String?   @unique
   description String?
   products    Product[]
   createdAt   DateTime  @default(now())
@@ -35,24 +36,54 @@ model Product {
   originalPrice Float?
   discount      String?
   image         String
+  galleryImages String?     @default("[]") // JSON string of images
   rating        Float       @default(0)
-  stock         Int         @default(0)
+  reviewCount   Int         @default(0)
+  stock         Int         @default(10)
   categoryId    String
   category      Category    @relation(fields: [categoryId], references: [id])
+  dressStyle    String      @default("Casual") // Casual, Formal, Party, Gym
+  sizes         String?     @default("[\"Small\",\"Medium\",\"Large\",\"X-Large\"]")
+  colors        String?     @default("[{\"name\":\"Olive\",\"value\":\"#4F5B37\"},{\"name\":\"Forest\",\"value\":\"#314F4A\"},{\"name\":\"Indigo\",\"value\":\"#31344F\"}]")
+  isNewArrival  Boolean     @default(false)
+  isTopSelling  Boolean     @default(false)
+  reviews       Review[]
   orderItems    OrderItem[]
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 }
 
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userName  String
+  rating    Float
+  comment   String
+  verified  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
 model Order {
-  id            String      @id @default(cuid())
-  userId        String
-  user          User        @relation(fields: [userId], references: [id])
-  status        String      @default("PENDING") // Changed from enum to string for sqlite
-  totalAmount   Float
-  orderItems    OrderItem[]
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id              String      @id @default(cuid())
+  userId          String?
+  user            User?       @relation(fields: [userId], references: [id])
+  status          String      @default("PENDING") // PENDING, PAID, SHIPPED, DELIVERED, CANCELLED
+  totalAmount     Float
+  subtotal        Float?
+  discountAmount  Float?      @default(0)
+  deliveryFee     Float?      @default(15)
+  promoCode       String?
+  shippingName    String?
+  shippingEmail   String?
+  shippingAddress String?
+  shippingCity    String?
+  shippingPostal  String?
+  shippingCountry String?
+  paymentMethod   String?     @default("card")
+  orderItems      OrderItem[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 }
 
 model OrderItem {
@@ -63,4 +94,8 @@ model OrderItem {
   product   Product @relation(fields: [productId], references: [id])
   quantity  Int
   price     Float
+  size      String?
+  color     String?
+  name      String?
+  image     String?
 }

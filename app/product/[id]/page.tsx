@@ -1,97 +1,130 @@
-import Image from "next/image"
-import { notFound } from "next/navigation"
-import prisma from "@/lib/prisma"
-import { SiteHeader } from "@/components/site/header"
-import { SiteFooter } from "@/components/site/footer"
-import { AddToCartButton } from "@/components/add-to-cart-button"
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Metadata } from "next";
 
-export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+import prisma from "@/lib/prisma";
+import { SiteHeader } from "@/components/site/header";
+import { SiteFooter } from "@/components/site/footer";
+import { containerClass } from "@/components/site/constants";
+import { ProductDetailView } from "@/components/product/product-detail-view";
+import { ProductCard } from "@/components/product-card";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
   const product = await prisma.product.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      category: true,
-    },
-  })
+    where: { id },
+    select: { name: true, description: true, price: true },
+  });
 
   if (!product) {
-    notFound()
+    return { title: "Product Not Found | ZENVIA" };
   }
 
+  return {
+    title: `${product.name} - $${product.price.toFixed(0)} | ZENVIA`,
+    description: product.description || "Discover premium fashion pieces at Zenvia.",
+  };
+}
+
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  const product = await prisma.product.findUnique({
+    where: { id },
+    include: {
+      category: true,
+      reviews: {
+        orderBy: { createdAt: "desc" },
+      },
+    },
+  });
+
+  if (!product) {
+    notFound();
+  }
+
+  // Fetch 4 related products from the same category (or top selling)
+  const relatedProducts = await prisma.product.findMany({
+    where: {
+      id: { not: product.id },
+      categoryId: product.categoryId,
+    },
+    take: 4,
+    orderBy: { rating: "desc" },
+  });
+
+  const fallbackProducts =
+    relatedProducts.length < 4
+      ? await prisma.product.findMany({
+          where: { id: { not: product.id } },
+          take: 4,
+          orderBy: { createdAt: "desc" },
+        })
+      : relatedProducts;
+
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="min-h-screen bg-white text-black">
       <SiteHeader />
-      <main className="flex-1 bg-gray-50/50">
-        <div className="container mx-auto px-4 py-12 md:py-16">
-          <div className="grid gap-12 md:grid-cols-2">
-            {/* Product Image */}
-            <div className="relative aspect-square overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200">
-              <Image
-                src={product.image || "/placeholder.svg"}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
 
-            {/* Product Details */}
-            <div className="flex flex-col gap-6">
-              <div>
-                <p className="mb-2 text-sm font-medium text-blue-600">
-                  {product.category?.name || "Uncategorized"}
-                </p>
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
-                  {product.name}
-                </h1>
-              </div>
+      <main className={`${containerClass} pt-6 pb-20 sm:pt-8`}>
+        {/* Breadcrumb Navigation */}
+        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2.5 text-sm text-black/60 sm:text-base pb-8">
+          <Link href="/" className="transition hover:text-black">
+            Home
+          </Link>
+          <span>/</span>
+          <Link href="/shop" className="transition hover:text-black">
+            Shop
+          </Link>
+          <span>/</span>
+          {product.category && (
+            <>
+              <Link href={`/shop?category=${product.category.slug || product.category.name.toLowerCase()}`} className="transition hover:text-black">
+                {product.category.name}
+              </Link>
+              <span>/</span>
+            </>
+          )}
+          <span className="font-medium text-black line-clamp-1">{product.name}</span>
+        </nav>
 
-              <div className="flex items-baseline gap-4">
-                <span className="text-3xl font-bold text-gray-900">
-                  ${product.price.toFixed(2)}
-                </span>
-                {product.originalPrice && product.originalPrice > product.price && (
-                  <span className="text-lg text-gray-500 line-through">
-                    ${product.originalPrice.toFixed(2)}
-                  </span>
-                )}
-                {product.discount && (
-                  <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-600">
-                    {product.discount}
-                  </span>
-                )}
-              </div>
+        {/* Main Product Details View */}
+        <ProductDetailView product={product} />
 
-              {product.description && (
-                <div className="prose prose-gray max-w-none">
-                  <p className="text-gray-600">{product.description}</p>
-                </div>
-              )}
-
-              <div className="mt-6 flex flex-col gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1">
-                    <span className="font-semibold">{product.rating}</span>
-                    <span className="text-yellow-400">★</span>
-                  </div>
-                  <span className="text-gray-300">|</span>
-                  <span className="text-sm text-gray-600">
-                    {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
-                  </span>
-                </div>
-
-                <div className="flex gap-4">
-                  <AddToCartButton product={product} />
-                </div>
-              </div>
-            </div>
+        {/* You Might Also Like Section */}
+        <section className="mt-20 sm:mt-28 space-y-10 sm:space-y-14">
+          <div className="text-center">
+            <h2 className="font-heading text-[32px] font-extrabold uppercase leading-none tracking-[-0.04em] text-black sm:text-[40px] lg:text-[48px]">
+              You might also like
+            </h2>
           </div>
-        </div>
+
+          <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 md:gap-x-5">
+            {fallbackProducts.map((relProduct) => (
+              <ProductCard
+                key={relProduct.id}
+                id={relProduct.id}
+                name={relProduct.name}
+                image={relProduct.image}
+                price={relProduct.price}
+                originalPrice={relProduct.originalPrice}
+                discount={relProduct.discount}
+                rating={relProduct.rating}
+              />
+            ))}
+          </div>
+        </section>
       </main>
+
       <SiteFooter />
     </div>
-  )
+  );
 }

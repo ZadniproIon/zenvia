@@ -1,12 +1,28 @@
-﻿import Image from "next/image";
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
 import { Mail } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { containerClass, footerColumns, paymentBadges, socialLinks } from "@/components/site/constants";
 
 export function SiteFooter() {
+  const [email, setEmail] = useState("");
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !email.includes("@")) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    toast.success("Thank you for subscribing! Your 20% discount code is SAVE20.");
+    setEmail("");
+  };
+
   return (
     <footer className="mt-28 bg-[#f0f0f0]">
       <div className={containerClass}>
@@ -16,12 +32,15 @@ export function SiteFooter() {
               Stay upto date about our latest offers
             </h2>
           </div>
-          <form className="mt-8 flex w-full max-w-[349px] flex-col gap-3.5 lg:mt-0" action="#">
+          <form className="mt-8 flex w-full max-w-[349px] flex-col gap-3.5 lg:mt-0" onSubmit={handleSubscribe}>
             <div className="relative">
               <Mail className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-black/40" />
               <Input
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
+                required
                 className="h-12 rounded-full border-0 bg-white pl-12 text-base text-black shadow-none placeholder:text-black/40 focus-visible:ring-1 focus-visible:ring-white/20"
               />
             </div>
@@ -50,6 +69,8 @@ export function SiteFooter() {
                   <Link
                     key={social.label}
                     href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label={social.label}
                     className={cn(
                       "flex size-7 items-center justify-center rounded-full border border-black/20 bg-white text-black transition hover:-translate-y-0.5",
@@ -68,9 +89,9 @@ export function SiteFooter() {
                   <h3 className="text-base font-medium uppercase tracking-[0.19em] text-black">{column.title}</h3>
                   <ul className="space-y-[19px] text-base text-black/60">
                     {column.items.map((item) => (
-                      <li key={item}>
-                        <Link href="#" className="transition hover:text-black">
-                          {item}
+                      <li key={item.label}>
+                        <Link href={item.href} className="transition hover:text-black">
+                          {item.label}
                         </Link>
                       </li>
                     ))}
@@ -81,7 +102,7 @@ export function SiteFooter() {
           </div>
 
           <div className="mt-12 border-t border-black/10 pt-6 sm:flex sm:items-center sm:justify-between">
-            <p className="text-sm text-black/60">Zenvia © 2000-2023, All Rights Reserved</p>
+            <p className="text-sm text-black/60">Zenvia © 2026, All Rights Reserved</p>
             <div className="mt-4 flex flex-wrap items-center gap-3 sm:mt-0 sm:justify-end">
               {paymentBadges.map((badge) => (
                 <Image key={badge.alt} src={badge.src} alt={badge.alt} width={47} height={30} className="h-[30px] w-auto" />

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Archivo, Manrope } from "next/font/google";
-import { CartProvider } from "@/components/cart-provider";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
@@ -29,13 +28,9 @@ export default function RootLayout({
     <html lang="en" className={`${manrope.variable} ${archivo.variable} h-full`}>
       <body className="min-h-full bg-background font-sans text-foreground antialiased">
         <Providers>
-          <CartProvider>
-            {children}
-          </CartProvider>
+          {children}
         </Providers>
       </body>
     </html>
   );
 }
-
-

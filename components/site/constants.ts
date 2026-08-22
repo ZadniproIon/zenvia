@@ -1,15 +1,29 @@
-﻿export const containerClass = "mx-auto w-full max-w-[1240px] px-4 sm:px-6 lg:px-0";
+export const containerClass = "mx-auto w-full max-w-[1240px] px-4 sm:px-6 lg:px-0";
 
-export const navLinks: Array<{ label: string; href: string; hasChevron?: boolean }> = [
-  { label: "Shop", href: "#shop", hasChevron: true },
-  { label: "On Sale", href: "#on-sale" },
-  { label: "New Arrivals", href: "#new-arrivals" },
-  { label: "Brands", href: "#brands" },
+export const navLinks: Array<{ label: string; href: string; hasChevron?: boolean; subItems?: Array<{ label: string; href: string }> }> = [
+  {
+    label: "Shop",
+    href: "/shop",
+    hasChevron: true,
+    subItems: [
+      { label: "All Products", href: "/shop" },
+      { label: "T-Shirts", href: "/shop?category=t-shirts" },
+      { label: "Shirts", href: "/shop?category=shirts" },
+      { label: "Jeans", href: "/shop?category=jeans" },
+      { label: "Shorts", href: "/shop?category=shorts" },
+      { label: "Hoodies", href: "/shop?category=hoodie" },
+    ]
+  },
+  { label: "On Sale", href: "/shop?onSale=true" },
+  { label: "New Arrivals", href: "/#new-arrivals" },
+  { label: "Brands", href: "/#brands" },
 ];
 
-export const devLinks = [
-  { label: "Product Page", href: "/dev/product" },
-  { label: "Store Page", href: "/dev/store" },
+export const quickLinks = [
+  { label: "Shop All", href: "/shop" },
+  { label: "Cart", href: "/cart" },
+  { label: "Wishlist", href: "/wishlist" },
+  { label: "Admin Dashboard", href: "/admin" },
 ] as const;
 
 export const brandLogos = [
@@ -23,27 +37,47 @@ export const brandLogos = [
 export const footerColumns = [
   {
     title: "Company",
-    items: ["About", "Features", "Works", "Career"],
+    items: [
+      { label: "About", href: "/#brands" },
+      { label: "Features", href: "/shop" },
+      { label: "Works", href: "/shop" },
+      { label: "Career", href: "/#testimonials" },
+    ],
   },
   {
     title: "Help",
-    items: ["Customer Support", "Delivery Details", "Terms & Conditions", "Privacy Policy"],
+    items: [
+      { label: "Customer Support", href: "/shop" },
+      { label: "Delivery Details", href: "/cart" },
+      { label: "Terms & Conditions", href: "/shop" },
+      { label: "Privacy Policy", href: "/shop" },
+    ],
   },
   {
     title: "FAQ",
-    items: ["Account", "Manage Deliveries", "Orders", "Payments"],
+    items: [
+      { label: "Account", href: "/login" },
+      { label: "Manage Deliveries", href: "/admin/orders" },
+      { label: "Orders", href: "/admin/orders" },
+      { label: "Payments", href: "/cart" },
+    ],
   },
   {
     title: "Resources",
-    items: ["Free eBooks", "Development Tutorial", "How to - Blog", "Youtube Playlist"],
+    items: [
+      { label: "Free eBooks", href: "/shop" },
+      { label: "Development Tutorial", href: "/shop" },
+      { label: "How to - Blog", href: "/shop" },
+      { label: "Youtube Playlist", href: "/shop" },
+    ],
   },
 ] as const;
 
 export const socialLinks: Array<{ label: string; href: string; mark: string; active?: boolean }> = [
-  { label: "Twitter", href: "#", mark: "t", active: true },
-  { label: "Facebook", href: "#", mark: "f" },
-  { label: "Instagram", href: "#", mark: "ig" },
-  { label: "Github", href: "#", mark: "gh" },
+  { label: "Twitter", href: "https://twitter.com", mark: "t", active: true },
+  { label: "Facebook", href: "https://facebook.com", mark: "f" },
+  { label: "Instagram", href: "https://instagram.com", mark: "ig" },
+  { label: "Github", href: "https://github.com", mark: "gh" },
 ];
 
 export const paymentBadges = [
