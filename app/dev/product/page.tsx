@@ -1,4 +1,4 @@
-﻿import Image from "next/image";
+import Image from "next/image";
 import Link from "next/link";
 import { Check, ChevronDown, Minus, MoreHorizontal, Plus, SlidersHorizontal, Star } from "lucide-react";
 
@@ -168,7 +168,7 @@ function ReviewCard({ review }: { review: Review }) {
 function RelatedProductCard({ product }: { product: RelatedProduct }) {
   return (
     <article className="space-y-3.5">
-      <div className="relative aspect-[295/298] overflow-hidden rounded-[20px] bg-[#f0eeed]">
+      <div className="relative aspect-[295/298] overflow-hidden rounded-[20px] bg-[#E2E2E2]">
         <Image src={product.image} alt={product.name} fill sizes="(max-width: 768px) 50vw, 295px" className={cn("object-contain", product.imageClassName)} />
       </div>
       <div className="space-y-2.5">
@@ -208,7 +208,7 @@ export default function ProductPage() {
                     key={image.src}
                     type="button"
                     className={cn(
-                      "relative aspect-[152/167] overflow-hidden rounded-[20px] bg-[#f0eeed]",
+                      "relative aspect-[152/167] overflow-hidden rounded-[20px] bg-[#E2E2E2]",
                       index === 0 && "border border-black"
                     )}
                     aria-label={`View product image ${index + 1}`}
@@ -218,7 +218,7 @@ export default function ProductPage() {
                 ))}
               </div>
 
-              <div className="relative min-h-[420px] overflow-hidden rounded-[20px] bg-[#f0eeed] sm:min-h-[530px]">
+              <div className="relative min-h-[420px] overflow-hidden rounded-[20px] bg-[#E2E2E2] sm:min-h-[530px]">
                 <Image src="/figma-product/product-main.png" alt="One Life Graphic T-shirt" fill priority sizes="(max-width: 1024px) 100vw, 444px" className="object-contain scale-[1.06]" />
               </div>
             </div>

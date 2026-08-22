@@ -27,6 +27,9 @@ async function main() {
   const hoodies = await prisma.category.create({
     data: { name: 'Hoodie', slug: 'hoodie', description: 'Cozy fleece pullovers and oversized premium streetwear.' }
   })
+  const shoes = await prisma.category.create({
+    data: { name: 'Shoes', slug: 'shoes', description: 'Iconic sneakers, running shoes, and luxury leather footwear.' }
+  })
 
   console.log('Seeding Users...')
   const admin = await prisma.user.create({

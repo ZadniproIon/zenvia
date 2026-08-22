@@ -124,12 +124,12 @@ export default async function OrderSuccessPage({
               {order.orderItems.map((item) => (
                 <div key={item.id} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="relative size-16 rounded-xl bg-[#F0EEED] p-1 shrink-0 overflow-hidden">
+                    <div className="relative size-16 rounded-xl bg-[#E2E2E2] shrink-0 overflow-hidden">
                       <Image
                         src={item.image || item.product?.image || "/placeholder.svg"}
                         alt={item.name || item.product?.name || "Product"}
                         fill
-                        className="object-contain p-1"
+                        className="object-cover"
                       />
                     </div>
                     <div>

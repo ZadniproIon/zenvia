@@ -68,13 +68,13 @@ export function CartView() {
         {cart.map((item) => (
           <div key={item.id} className="flex gap-4 py-5 first:pt-0 last:pb-0 items-center">
             {/* Product Thumbnail */}
-            <div className="relative aspect-square size-[99px] sm:size-[124px] shrink-0 overflow-hidden rounded-[16px] bg-[#F0EEED] p-2">
+            <div className="relative aspect-square size-[99px] sm:size-[124px] shrink-0 overflow-hidden rounded-[16px] bg-[#E2E2E2]">
               <Image
                 src={item.image || "/placeholder.svg"}
                 alt={item.name}
                 fill
                 sizes="124px"
-                className="object-contain p-1"
+                className="object-cover"
               />
             </div>
 

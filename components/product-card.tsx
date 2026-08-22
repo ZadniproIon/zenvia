@@ -9,6 +9,7 @@ import { useWishlist } from "@/components/wishlist-provider";
 export type ProductCardProps = {
   id: string;
   name: string;
+  brand?: string | null;
   image: string;
   price: number;
   originalPrice?: number | null;
@@ -54,6 +55,7 @@ export function PriceBlock({ price, originalPrice, discount }: { price: number; 
 export function ProductCard({
   id,
   name,
+  brand,
   image,
   price,
   originalPrice,
@@ -67,14 +69,14 @@ export function ProductCard({
 
   return (
     <article className={cn("group relative flex flex-col space-y-3.5", className)}>
-      <div className="relative aspect-[295/298] w-full overflow-hidden rounded-[20px] bg-[#f0eeed]">
+      <div className="relative aspect-[295/298] w-full overflow-hidden rounded-[20px] bg-[#E2E2E2]">
         <Link href={`/product/${id}`} className="absolute inset-0">
           <Image
             src={image || "/placeholder.svg"}
             alt={name}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 295px"
-            className={cn("object-contain p-4 transition-transform duration-300 group-hover:scale-105", imageClassName)}
+            className={cn("object-cover transition-transform duration-300 group-hover:scale-105", imageClassName)}
           />
         </Link>
 
@@ -96,7 +98,12 @@ export function ProductCard({
         </button>
       </div>
 
-      <div className="flex-1 space-y-2">
+      <div className="flex-1 space-y-1.5">
+        {brand && (
+          <span className="text-[11px] font-bold uppercase tracking-wider text-black/50 block">
+            {brand}
+          </span>
+        )}
         <Link href={`/product/${id}`}>
           <h3 className="text-base font-bold leading-snug text-black transition group-hover:text-black/70 sm:text-[18px] lg:text-[19px] line-clamp-1">
             {name}

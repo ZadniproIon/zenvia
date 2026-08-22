@@ -184,6 +184,7 @@ export default async function Home() {
                   key={product.id}
                   id={product.id}
                   name={product.name}
+                  brand={product.brand}
                   image={product.image}
                   price={product.price}
                   originalPrice={product.originalPrice}
@@ -219,6 +220,7 @@ export default async function Home() {
                   key={product.id}
                   id={product.id}
                   name={product.name}
+                  brand={product.brand}
                   image={product.image}
                   price={product.price}
                   originalPrice={product.originalPrice}

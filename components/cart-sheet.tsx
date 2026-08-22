@@ -48,13 +48,13 @@ export function CartSheet() {
             <div className="divide-y divide-black/10">
               {cart.map((item) => (
                 <div key={item.id} className="py-3.5 first:pt-0 last:pb-0 flex gap-3.5 items-center">
-                  <div className="relative size-16 rounded-xl overflow-hidden shrink-0 bg-[#F0EEED] p-1 border border-black/5">
+                  <div className="relative size-16 rounded-xl overflow-hidden shrink-0 bg-[#E2E2E2] border border-black/5">
                     <Image
                       src={item.image || "/placeholder.svg"}
                       alt={item.name}
                       fill
                       sizes="64px"
-                      className="object-contain p-1"
+                      className="object-cover"
                     />
                   </div>
                   <div className="flex-1 min-w-0">

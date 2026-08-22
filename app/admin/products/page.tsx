@@ -32,6 +32,7 @@ export default async function AdminProductsPage() {
             <thead className="text-xs text-gray-600 uppercase bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-4">Product</th>
+                <th className="px-6 py-4">Brand</th>
                 <th className="px-6 py-4">Category</th>
                 <th className="px-6 py-4">Style</th>
                 <th className="px-6 py-4">Price</th>
@@ -50,7 +51,7 @@ export default async function AdminProductsPage() {
                           src={product.image || "/placeholder.svg"}
                           alt={product.name}
                           fill
-                          className="object-contain"
+                          className="object-cover"
                         />
                       </div>
                       <div>
@@ -65,6 +66,11 @@ export default async function AdminProductsPage() {
                         <span className="text-xs text-gray-400 block">{product.id.slice(0, 10)}...</span>
                       </div>
                     </div>
+                  </td>
+                  <td className="px-6 py-4 font-bold text-gray-900">
+                    <span className="bg-black/5 text-black px-2.5 py-1 rounded-md text-xs font-bold uppercase">
+                      {product.brand || "ZENVIA"}
+                    </span>
                   </td>
                   <td className="px-6 py-4 text-gray-600 font-medium">{product.category.name}</td>
                   <td className="px-6 py-4">

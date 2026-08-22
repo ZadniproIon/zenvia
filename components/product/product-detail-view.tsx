@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { BadgeCheck, Check, ChevronDown, Heart, Minus, Plus, SlidersHorizontal, Star } from "lucide-react";
+import { BadgeCheck, Check, ChevronDown, Heart, Maximize2, Minus, Plus, SlidersHorizontal, Star, ZoomIn } from "lucide-react";
 
 import { useCart } from "@/components/cart-provider";
 import { useWishlist } from "@/components/wishlist-provider";
 import { RatingStars } from "@/components/product-card";
 import { WriteReviewDialog } from "@/components/product/write-review-dialog";
+import { ImageViewerDialog } from "@/components/product/image-viewer-dialog";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +16,7 @@ export type ProductDetailViewProps = {
   product: {
     id: string;
     name: string;
+    brand?: string | null;
     description: string | null;
     price: number;
     originalPrice: number | null;
@@ -24,6 +26,7 @@ export type ProductDetailViewProps = {
     rating: number;
     reviewCount: number;
     stock: number;
+    dressStyle?: string | null;
     sizes: string | null;
     colors: string | null;
     category?: { name: string; slug: string | null } | null;
@@ -83,6 +86,16 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
   const [sortReviews, setSortReviews] = useState<"latest" | "highest">("latest");
   const [visibleReviewCount, setVisibleReviewCount] = useState(6);
 
+  // Fullscreen Image Viewer Modal State
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const currentImageIndex = gallery.indexOf(activeImage) >= 0 ? gallery.indexOf(activeImage) : 0;
+  const [viewerIndex, setViewerIndex] = useState(0);
+
+  const openViewerAtIndex = (idx: number) => {
+    setViewerIndex(idx);
+    setIsViewerOpen(true);
+  };
+
   const activeWishlist = isInWishlist(product.id);
 
   const handleAddToCart = () => {
@@ -116,9 +129,11 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
               <button
                 key={`${img}-${idx}`}
                 type="button"
-                onClick={() => setActiveImage(img)}
+                onClick={() => {
+                  setActiveImage(img);
+                }}
                 className={cn(
-                  "relative aspect-square w-24 shrink-0 overflow-hidden rounded-[20px] bg-[#F0EEED] p-2 transition sm:h-[167px] sm:w-full cursor-pointer",
+                  "relative aspect-square w-24 shrink-0 overflow-hidden rounded-[20px] bg-[#E2E2E2] transition sm:h-[167px] sm:w-full cursor-pointer",
                   activeImage === img ? "border-2 border-black" : "border border-transparent hover:border-black/20"
                 )}
               >
@@ -127,28 +142,60 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                   alt={`${product.name} thumbnail ${idx + 1}`}
                   fill
                   sizes="152px"
-                  className="object-contain p-2"
+                  className="object-cover"
                 />
               </button>
             ))}
           </div>
 
-          {/* Large Main Preview Image */}
-          <div className="relative aspect-square w-full overflow-hidden rounded-[20px] bg-[#F0EEED] sm:h-[530px]">
+          {/* Large Main Preview Image with Click to Zoom */}
+          <div
+            onClick={() => openViewerAtIndex(currentImageIndex)}
+            className="group relative aspect-square w-full overflow-hidden rounded-[20px] bg-[#E2E2E2] sm:h-[530px] cursor-zoom-in"
+          >
             <Image
               src={activeImage || product.image}
               alt={product.name}
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 444px"
-              className="object-contain p-6 transition duration-300"
+              className="object-cover transition duration-300 group-hover:scale-105"
             />
+
+            {/* Expand / Zoom Overlay Badge */}
+            <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-black/70 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md opacity-0 transition group-hover:opacity-100 shadow-md">
+              <ZoomIn className="size-3.5" />
+              <span>Full View</span>
+            </div>
           </div>
         </div>
+
+        {/* Fullscreen Carousel Modal */}
+        <ImageViewerDialog
+          isOpen={isViewerOpen}
+          onClose={() => setIsViewerOpen(false)}
+          images={gallery}
+          currentIndex={viewerIndex}
+          onSelectIndex={setViewerIndex}
+          productName={product.name}
+          brand={product.brand}
+        />
 
         {/* Right Column: Product Info & Purchase Options */}
         <div className="space-y-6 lg:py-2">
           <div className="space-y-3.5">
+            {product.brand && (
+              <div className="inline-flex items-center gap-2">
+                <span className="rounded-full bg-black px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
+                  {product.brand}
+                </span>
+                {product.dressStyle && (
+                  <span className="rounded-full bg-black/5 px-3 py-1 text-xs font-semibold text-black/70">
+                    {product.dressStyle}
+                  </span>
+                )}
+              </div>
+            )}
             <h1 className="font-heading text-[32px] font-extrabold uppercase leading-[1.05] tracking-[-0.04em] text-black sm:text-[40px]">
               {product.name}
             </h1>

@@ -54,14 +54,14 @@ export function WishlistView() {
       <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {wishlist.map((item) => (
           <article key={item.id} className="group relative flex flex-col space-y-3.5 border border-black/10 rounded-[20px] p-3 bg-white">
-            <div className="relative aspect-[295/298] w-full overflow-hidden rounded-[16px] bg-[#f0eeed]">
+            <div className="relative aspect-[295/298] w-full overflow-hidden rounded-[16px] bg-[#E2E2E2]">
               <Link href={`/product/${item.id}`} className="absolute inset-0">
                 <Image
                   src={item.image || "/placeholder.svg"}
                   alt={item.name}
                   fill
                   sizes="250px"
-                  className="object-contain p-4 transition duration-300 group-hover:scale-105"
+                  className="object-cover transition duration-300 group-hover:scale-105"
                 />
               </Link>
               <button

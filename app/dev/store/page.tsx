@@ -68,7 +68,7 @@ function PriceBlock({ price, originalPrice, discount }: { price: number; origina
 function StoreProductCard({ product }: { product: Product & { imageClassName?: string } }) {
   return (
     <Link href={`/product/${product.id}`} className="group block space-y-3.5">
-      <div className="relative aspect-[295/298] overflow-hidden rounded-[20px] bg-[#F0EEED]">
+      <div className="relative aspect-[295/298] overflow-hidden rounded-[20px] bg-[#E2E2E2]">
         <Image src={product.image} alt={product.name} fill sizes="(max-width: 1024px) 50vw, 295px" className={cn("object-contain transition-transform group-hover:scale-105", product.imageClassName)} />
       </div>
       <div className="space-y-2.5">

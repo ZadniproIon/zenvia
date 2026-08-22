@@ -15,6 +15,7 @@ const categoryLinks = [
   { label: "Jeans", value: "jeans" },
   { label: "Shorts", value: "shorts" },
   { label: "Hoodie", value: "hoodie" },
+  { label: "Shoes", value: "shoes" },
 ];
 
 const dressStyles = [

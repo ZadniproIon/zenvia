@@ -12,6 +12,7 @@ export const navLinks: Array<{ label: string; href: string; hasChevron?: boolean
       { label: "Jeans", href: "/shop?category=jeans" },
       { label: "Shorts", href: "/shop?category=shorts" },
       { label: "Hoodies", href: "/shop?category=hoodie" },
+      { label: "Shoes & Sneakers", href: "/shop?category=shoes" },
     ]
   },
   { label: "On Sale", href: "/shop?onSale=true" },

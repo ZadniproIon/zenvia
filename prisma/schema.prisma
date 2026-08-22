@@ -42,6 +42,7 @@ model Product {
   stock         Int         @default(10)
   categoryId    String
   category      Category    @relation(fields: [categoryId], references: [id])
+  brand         String?     @default("Zenvia")
   dressStyle    String      @default("Casual") // Casual, Formal, Party, Gym
   sizes         String?     @default("[\"Small\",\"Medium\",\"Large\",\"X-Large\"]")
   colors        String?     @default("[{\"name\":\"Olive\",\"value\":\"#4F5B37\"},{\"name\":\"Forest\",\"value\":\"#314F4A\"},{\"name\":\"Indigo\",\"value\":\"#31344F\"}]")

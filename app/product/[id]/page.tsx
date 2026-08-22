@@ -113,6 +113,7 @@ export default async function ProductPage({
                 key={relProduct.id}
                 id={relProduct.id}
                 name={relProduct.name}
+                brand={relProduct.brand}
                 image={relProduct.image}
                 price={relProduct.price}
                 originalPrice={relProduct.originalPrice}
